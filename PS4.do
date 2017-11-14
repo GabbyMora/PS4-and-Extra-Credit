@@ -1,3 +1,30 @@
+
+Skip to content
+This repository
+
+    Pull requests
+    Issues
+    Marketplace
+    Explore
+
+    @theaok
+
+1
+0
+
+    0
+
+GabbyMora/PS4-and-Extra-Credit
+Code
+Issues 0
+Pull requests 0
+Projects 0
+Wiki
+Insights
+PS4-and-Extra-Credit/PS4.do
+1eb6cf4 33 minutes ago
+@GabbyMora GabbyMora Add files via upload
+90 lines (62 sloc) 2.66 KB
 ***********************//////////Gabby Mora////////////************************************************
 
 /////////*Problem Set 4*//////
@@ -24,9 +51,10 @@ display r(varlist)
 
 local subset if e(unspecified)
 
-ta LocationType, rename(unspecified)
+ta LocationType, rename(unspecified) //this command doesnt work
 
-
+//this whole thing should be commented out eg sth like this
+/*
           // Location Type |      Freq.     Percent        Cum.
 ---------------------------+-----------------------------------
                 Commercial |          2        0.32        0.32
@@ -38,7 +66,7 @@ Residential Building/House |        379       59.78       65.62
            Street/Sidewalk |        166       26.18      100.00
 ---------------------------+-----------------------------------
                      Total |        634      100.00//
-
+*/
 
 reg LocationType
 
@@ -59,7 +87,7 @@ hist `vName'N, percent  discrete xla(1/`r(r)', valuelabel noticks angle(vertical
 end
  
  
-CrueltyLoop LocationType 
+CrueltyLoop LocationType //ok, but wonder why is it called cruelty loop?
  
 d
 replace CrossStreet1=lower(CrossStreet1)
@@ -87,3 +115,6 @@ d
 replace FacilityType=lower(Facility)
 
 replace SchoolName=(missing)
+
+and need to substract say 3 points for late submission
+
