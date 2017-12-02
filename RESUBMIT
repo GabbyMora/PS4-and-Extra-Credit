@@ -1,0 +1,909 @@
+************************//////////Gabby Mora////////////************************
+
+                         /////////*Problem Set 4*//////
+                         ////////*Data Management*/////
+                         //////////*Fall 2017*/////////
+                         //////////*RESUBMIT*//////////
+                         
+/******************************************************************************
+COMMENTS
+*******************************************************************************
+Macros and loops are extremely challenging for me. I tried to work around some of the
+issues ad create loops that would make sense for my datasets, which I think I did, 
+but I still do not feel like I made the best use of them. For the macros, I kept
+having issues with them running; not sure if it was because they are all local macros
+so the macros would disappear after running another macro. I tried to find information
+on this issue online but was not able to solve it.
+I was nervous to re-clean my datasets with loops because I am not confident about the use
+of loops so I did not redo those but instead, performed other tasks with loops at the 
+bottom of the problem set.*/
+
+/*------------------------------------------------------------------------------
+********************************************************************************
+--------------------------------------------------------------------------------
+                         CLEAN UP MY DATASETS
+--------------------------------------------------------------------------------
+********************************************************************************
+------------------------------------------------------------------------------*/
+
+import excel "https://docs.google.com/uc?id=0BywXSn44t-HlS19LS0Z1cnVoQkE&export=download", firstrow clear
+ 
+/*______________________________________________________________________________
+                        CLEAN UP ANIMAL CRUELTY DATASET
+______________________________________________________________________________*/
+
+drop UniqueKey CreatedDate ClosedDate Agency IncidentAddress StreetName CrossStreet1 CrossStreet2 IntersectionStreet1 IntersectionStreet2 AddressType Landmark Status DueDate ResolutionActionUpdatedDate CommunityBoard Borough XCoordinateStatePlane YCoordinateStatePlane ParkFacilityName ParkBorough SchoolName SchoolNumber SchoolRegion SchoolCode SchoolPhoneNumber SchoolAddress SchoolCity SchoolState SchoolZip SchoolNotFound SchoolorCitywideComplaint VehicleType TaxiCompanyBorough TaxiPickUpLocation BridgeHighwayName BridgeHighwayDirection RoadRamp BridgeHighwaySegment GarageLotName FerryDirection FerryTerminalName Latitude Longitude Location
+
+edit 
+ 
+tab Descriptor
+
+/*
+
+               Descriptor |      Freq.     Percent        Cum.
+--------------------------+-----------------------------------
+                  Chained |         40        6.31        6.31
+                   In Car |         38        5.99       12.30
+                Neglected |        292       46.06       58.36
+               No Shelter |         23        3.63       61.99
+Other (complaint details) |        149       23.50       85.49
+                 Tortured |         92       14.51      100.00
+--------------------------+-----------------------------------
+                    Total |        634      100.00
+*/
+
+describe Descriptor
+
+/*
+              storage   display    value
+variable name   type    format     label      variable label
+--------------------------------------------------------------------------------
+Descriptor      str25   %25s                  Descriptor
+
+*/
+
+encode Descriptor, generate(Descriptor_n)
+
+/*
+
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+Descriptor_n |        634    3.755521    1.423736          1          6
+
+*/
+
+move Descriptor_n Descriptor
+
+drop Descriptor
+
+rename Descriptor_n Descriptor
+
+tab LocationType
+
+/*
+             Location Type |      Freq.     Percent        Cum.
+---------------------------+-----------------------------------
+                Commercial |          2        0.32        0.32
+           House and Store |          3        0.47        0.79
+           Park/Playground |         14        2.21        3.00
+      Residential Building |         18        2.84        5.84
+Residential Building/House |        379       59.78       65.62
+          Store/Commercial |         52        8.20       73.82
+           Street/Sidewalk |        166       26.18      100.00
+---------------------------+-----------------------------------
+                     Total |        634      100.00
+
+*/
+
+describe LocationType
+
+/*
+              storage   display    value
+variable name   type    format     label      variable label
+--------------------------------------------------------------------------------
+LocationType    str26   %26s                  Location Type
+
+*/
+
+encode LocationType, generate(LocationType_n)
+
+summarize LocationType_n
+
+/*
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+LocationTy~n |        634    5.506309    1.041383          1          7
+
+*/
+
+move LocationType_n LocationType
+
+drop LocationType
+
+rename LocationType_n LocationType
+
+rename IncidentZip ZipCode
+
+save Animal_Abuse_COMPLETE, replace
+
+/*______________________________________________________________________________
+                     CLEAN UP HIV TESTING CENTERS DATASET
+______________________________________________________________________________*/
+clear
+
+import excel "https://docs.google.com/uc?id=0BywXSn44t-HlSmdVS2swdU4ycVE&export=download", firstrow clear
+
+drop SiteID AgencyID Address City Borough State BriefDescription AgesServed GendersServed RequiredDocuments Website PhoneNumber BuildingFloorSuite AdditionalInformation
+
+drop HoursMonday HoursTuesday HoursWednesday HoursThursday HoursFriday HoursSaturday HoursSunday Intake OtherInsurances SiteLanguages
+
+encode ZipCode, generate(ZipCode_n)
+
+drop ZipCode
+
+rename ZipCode_n ZipCode
+
+replace ZipCode=0 if ZipCode==.
+
+save HIV_Testing_Centers_Clean, replace
+
+/*______________________________________________________________________________
+                       CLEAN UP DEMOGRAPHICS DATASET
+______________________________________________________________________________*/
+
+clear
+
+import excel "https://docs.google.com/uc?id=0BywXSn44t-HlMURzMmVjUExDRjg&export=download", firstrow clear
+
+rename JURISDICTIONNAME ZipCode
+
+drop COUNTGENDERUNKNOWN PERCENTGENDERUNKNOWN PERCENTFEMALE PERCENTMALE COUNTGENDERTOTAL PERCENTGENDERTOTAL PERCENTPACIFICISLANDER PERCENTHISPANICLATINO PERCENTAMERICANINDIAN PERCENTASIANNONHISPANIC PERCENTWHITENONHISPANIC PERCENTBLACKNONHISPANIC PERCENTOTHERETHNICITY PERCENTETHNICITYUNKNOWN COUNTETHNICITYTOTAL PERCENTETHNICITYTOTAL COUNTPERMANENTRESIDENT PERCENTPERMANENTRESIDENT COUNTUSCITIZEN PERCENTUSCITIZEN COUNTOTHERCITIZENSTATUS PERCENTOTHERCITIZENSTATUS COUNTCITIZENSTATUSUNKNOWN PERCENTCITIZENSTATUSUNKNOWN COUNTCITIZENSTATUSTOTAL PERCENTCITIZENSTATUSTOTAL PERCENTRECEIVESPUBLICASSISTAN PERCENTNRECEIVESPUBLICASSISTA PERCENTPUBLICASSISTANCEUNKNOW PERCENTPUBLICASSISTANCETOTAL
+
+rename(COUNTPARTICIPANTS COUNTFEMALE COUNTMALE COUNTPACIFICISLANDER COUNTHISPANICLATINO COUNTAMERICANINDIAN COUNTASIANNONHISPANIC COUNTWHITENONHISPANIC COUNTBLACKNONHISPANIC COUNTOTHERETHNICITY COUNTETHNICITYUNKNOWN COUNTRECEIVESPUBLICASSISTANCE COUNTNRECEIVESPUBLICASSISTANC COUNTPUBLICASSISTANCEUNKNOWN) (TotalParticipants Female Male PacificIslander HispanicLatino AmericanIndian Asian White AfricanAmerican OtherEthnicity EthnicityUnknown PublicAssistance NoPublicAssistance PublicAssistanceUnknown)
+
+save Demographics_Clean, replace
+
+/*______________________________________________________________________________
+                      CLEAN UP FILMING PERMITS DATASET
+______________________________________________________________________________*/
+
+clear
+
+import excel "https://docs.google.com/uc?id=0BywXSn44t-HlWnhZVkFzN1pNZ28&export=download", firstrow clear
+
+drop EventID StartDateTime EndDateTime EnteredOn CommunityBoards Country ParkingHeld EventAgency SubCategoryName 
+
+rename ZipCodes ZipCode
+
+gen newzip=substr(ZipCode, 1, 5)
+
+gen newzip2=substr(ZipCode, -5, 5) 
+
+drop ZipCode
+
+rename newzip ZipCode
+
+drop newzip2
+
+encode ZipCode, generate(ZipCode_n)
+
+drop ZipCode
+
+rename ZipCode_n ZipCode
+
+save Filming_Permits_Clean, replace
+
+/*______________________________________________________________________________
+                        CLEAN UP GARDENS DATASET
+______________________________________________________________________________*/
+
+clear
+
+import excel "https://docs.google.com/uc?id=0BywXSn44t-HlRGQ5ZC1aYW9nYzA&export=download", firstrow clear
+
+drop PropID Boro CommunityBoard CouncilDistrict CrossStreets Latitude Longitude CensusTract BIN BBL NTA
+
+rename Postcode ZipCode
+
+encode ZipCode, generate(ZipCode_n)
+
+drop ZipCode
+
+rename ZipCode_n ZipCode
+
+replace ZipCode=0 if ZipCode==.
+
+save Gardens_Clean, replace
+
+/*______________________________________________________________________________
+                      CLEAN UP FARMERS MARKET DATASET
+________________________________________________________________________________*/
+
+clear
+
+import excel "https://docs.google.com/uc?id=0BywXSn44t-HlTUhfR3ZQQ3hyZlE&export=download", firstrow clear
+
+drop AdditionalInformation Latitude Longitude
+
+save Farmers_Markets_Clean, replace
+
+********************************************************************************
+/*------------------------------------------------------------------------------
+********************************************************************************
+--------------------------------------------------------------------------------
+                    MERGING MY DATASETS BY ZIPCODE 
+--------------------------------------------------------------------------------
+********************************************************************************
+------------------------------------------------------------------------------*/
+
+********************************************************************************
+/*HIV TESTING CENTERS DATASET*/
+
+use "Animal_Abuse_COMPLETE"
+
+merge m:m ZipCode using "HIV_Testing_Centers_Clean"
+
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         1,233
+        from master                       634  (_merge==1)
+        from using                        599  (_merge==2)
+
+    matched                                 0  (_merge==3)
+    -----------------------------------------
+*/
+
+********************************************************************************
+/*DEMOGRAPHICS DATASET*/
+
+drop _merge
+
+merge m:m ZipCode using "Demographics_Clean"
+/*Stata said variable Merge was already defined so I decided to drop it so I 
+could merge the second dataset to my master dataset*/
+
+drop _merge
+
+merge m:m ZipCode using "Demographics_Clean"
+
+/*
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                           830
+        from master                       599  (_merge==1)
+        from using                        231  (_merge==2)
+
+    matched                               634  (_merge==3)
+    -----------------------------------------
+*/
+
+********************************************************************************
+/*FILMING PERMITS DATASET*/
+
+drop _merge
+
+merge m:m ZipCode using "Filming_Permits_Clean"
+
+/*
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         4,615
+        from master                       959  (_merge==1)
+        from using                      3,656  (_merge==2)
+
+    matched                            40,437  (_merge==3)
+    -----------------------------------------
+*/
+
+********************************************************************************
+/*GARDENS DATASET*/
+
+drop _merge
+
+merge m:m ZipCode using "Gardens_Clean"
+
+/*
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                        20,667
+        from master                    20,667  (_merge==1)
+        from using                          0  (_merge==2)
+
+    matched                            24,458  (_merge==3)
+    -----------------------------------------
+*/
+
+********************************************************************************
+/*FARMERS MARKET DATASET*/
+
+drop _merge
+
+merge m:m ZipCode using "Farmers_Markets_Clean"
+
+/*
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                        44,697
+        from master                    44,694  (_merge==1)
+        from using                          3  (_merge==2)
+
+    matched                               460  (_merge==3)
+    -----------------------------------------
+*/
+
+drop _merge
+
+save Animal_Abuse_COMPLETE, replace
+
+/*------------------------------------------------------------------------------
+********************************************************************************
+--------------------------------------------------------------------------------
+                     POST-MERGING CLEANING AND RESHAPING
+--------------------------------------------------------------------------------
+********************************************************************************
+------------------------------------------------------------------------------*/
+
+
+replace Descriptor=0 if Descriptor==.
+/*Since Descriptor is my independent variable, any observations that do not 
+include a Descriptor are irrelevant to my research*/
+
+collapse Descriptor, by (ZipCode) 
+
+drop if Descriptor==.
+
+/*
+     (mean) |
+ Descriptor |      Freq.     Percent        Cum.
+------------+-----------------------------------
+        3.4 |          1       20.00       20.00
+   3.689655 |          1       20.00       40.00
+   3.716102 |          1       20.00       60.00
+       3.75 |          1       20.00       80.00
+   3.831325 |          1       20.00      100.00
+------------+-----------------------------------
+      Total |          5      100.00
+
+*/
+//this information was, once again, not helpful to me//
+
+tabulate ZipCode Descriptor
+
+/*
+Incident |                            Descriptor
+Zip      |Chained In Car  Neglected  No Shelte     Other  Tortured |     Total
+---------+-----------------------------------------------------------+----------
+   10002 |    18    12        111          9         50         36 |       236 
+   10003 |     4    14         47          6         39          6 |       116 
+   10009 |    14    11        120          8         50         46 |       249 
+   10013 |     1     1          1          0          1          1 |         5 
+   10038 |     3     0         13          0          9          3 |        28 
+---------+---------------------------------------------------------+----------
+   Total |    40    38        292         23        149         92 |       634 
+*/
+/*I was finally able to figure out how to see how many incidents per incident
+type happened in each zip code I went online to look up where zip code 10002 
+was located in NYC (since it has the largest number of incidents, and found it 
+is the East Village//
+Once I found this information I was realized that my Gardens dataset has 
+information on specific neighborhoords, including the East Village, so I 
+decided to look at some of the observations in that dataset*/
+
+use "Gardens_Clean"
+
+tab NeighborhoodName
+
+/*
+        NeighborhoodName |      Freq.     Percent        Cum.
+-------------------------+-----------------------------------
+                Melrose |          1        0.31        0.31
+                Bed-Stuy |         29        8.98        9.29
+                 Belmont |          1        0.31        9.60
+             Boerum Hill |          3        0.93       10.53
+        Brooklyn Heights |          1        0.31       10.84
+             Brownsville |         13        4.02       14.86
+                Bushwick |          5        1.55       16.41
+         Cambria Heights |          1        0.31       16.72
+          Central Harlem |          4        1.24       17.96
+                 Chelsey |          1        0.31       18.27
+            Clinton Hill |          3        0.93       19.20
+            Coney Island |          5        1.55       20.74
+                  Corona |          3        0.93       21.67
+                 Crotona |          2        0.62       22.29
+           Crown Heights |          7        2.17       24.46
+       Downtown Brooklyn |          2        0.62       25.08
+      Downtown Manhattan |          1        0.31       25.39
+             East Harlem |         32        9.91       35.29
+           East New York |         45       13.93       49.23
+            East Village |         35       10.84       60.06
+       East Williamsburg |          1        0.31       60.37
+            Far Rockaway |          3        0.93       61.30
+                Flushing |          1        0.31       61.61
+            Forest Hills |          1        0.31       61.92
+         Grand Concourse |          1        0.31       62.23
+              Greenpoint |          1        0.31       62.54
+       Greenwich Village |          1        0.31       62.85
+        Hamilton Heights |          8        2.48       65.33
+                  Harlem |          8        2.48       67.80
+          Hell's Kitchen |          3        0.93       68.73
+              Highbridge |          6        1.86       70.59
+           Highland Park |          1        0.31       70.90
+            Hunt's Point |          1        0.31       71.21
+                  Inwood |          1        0.31       71.52
+                 Jamaica |          3        0.93       72.45
+              Kensington |          2        0.62       73.07
+      Kingbridge Heights |          1        0.31       73.37
+     Kingsbridge Heights |          1        0.31       73.68
+        Long Island City |          1        0.31       73.99
+         Lower East Side |          7        2.17       76.16
+             Marble Hill |          1        0.31       76.47
+                 Melrose |         11        3.41       79.88
+                 Midtown |          1        0.31       80.19
+              Morrisania |          5        1.55       81.73
+              Mott Haven |          1        0.31       82.04
+                Mt. Eden |          2        0.62       82.66
+          North Flatbush |          1        0.31       82.97
+Ocean Hill / Brownsville |          1        0.31       83.28
+              Ozone Park |          1        0.31       83.59
+              Park Slope |          8        2.48       86.07
+        Prospect Heights |          4        1.24       87.31
+                Red Hook |          5        1.55       88.85
+        Roosevelt Island |          1        0.31       89.16
+           Schuylerville |          1        0.31       89.47
+          So. Ozone Park |          1        0.31       89.78
+               Soundview |          1        0.31       90.09
+     Springfield Gardens |          1        0.31       90.40
+             Sunset Park |          1        0.31       90.71
+                 Tremont |          1        0.31       91.02
+         Upper East Side |          1        0.31       91.33
+         Upper West Side |          7        2.17       93.50
+               Wakefield |          1        0.31       93.81
+      Washington Heights |          8        2.48       96.28
+              West Farms |          1        0.31       96.59
+             West Harlem |          3        0.93       97.52
+            West Village |          1        0.31       97.83
+            Williamsburg |          7        2.17      100.00
+-------------------------+-----------------------------------
+                   Total |        323      100.00
+*/
+
+//by looking at the frequency distribution, I can see that the East Village//
+// has 35 parks out of the total 323 parks in NYC//
+
+
+
+save "Animal_Abuse_COMPLETE", replace
+
+
+
+/*------------------------------------------------------------------------------
+********************************************************************************
+--------------------------------------------------------------------------------
+                              MACROS AND LOOPS
+--------------------------------------------------------------------------------
+********************************************************************************
+------------------------------------------------------------------------------*/
+
+clear
+
+use "Animal_Abuse_COMPLETE"
+
+local race PacificIslander HispanicLatino AmericanIndian Asian White AfricanAmerican OtherEthnicity EthnicityUnknown
+
+di `race'
+
+summarize `race'
+
+/*
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+PacificIsl~r |        894    .0067114    .1056083          0          2
+HispanicLa~o |        894    .9563758    3.850408          0         51
+AmericanIn~n |        894      .00783     .100085          0          2
+       Asian |        894    8.501119    11.80409          0         28
+       White |        894    4.821029     21.0987          0        262
+-------------+---------------------------------------------------------
+AfricanAme~n |        894     .909396    4.366171          0         60
+OtherEthni~y |        894    .2024609    .9928945          0         17
+EthnicityU~n |        894     .033557    .3048567          0          5
+
+*/
+//I was hoping this would show me how many overall observations were found per//
+//racial group but it only showe me the statistics//
+
+
+encode FarmersMarketName, generate(Farmers_n)
+
+move Farmers_n FarmersMarketName
+
+drop FarmersMarketName
+
+rename Farmers_n FarmersMarketName
+
+encode PolicePrecincts, generate(Police_n)
+
+move Police_n PolicePrecincts
+
+drop PolicePrecincts
+
+rename Police_n PolicePrecinct
+
+encode GardenName, generate(Garden_n)
+
+move Garden_n GardenName
+
+drop GardenName
+
+rename Garden_n GardenName
+
+encode Category, generate(Cat_n)
+
+move Cat_n Category
+
+drop Category
+
+rename Cat_n Category
+
+local wealthy FarmersMarketName PolicePrecinct GardenName Category
+
+/*After I manually encoded many of the variables I would use for immediate
+macros I realized I should use a loop to encode all string variables//
+I had to do encode instead of destring because my variables did not have 
+any numeric values*/
+
+ds, has(type str#)
+foreach v of varlist `r(varlist)'{
+encode `v', generate(`v'_n) 
+}
+
+
+
+save "Animal_Abuse_COMPLETE", replace
+
+local gender Male Female 
+
+summarize `gender'
+
+/*
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+        Male |        894    7.040268    11.46398          0        157
+      Female |        894     8.39821    16.50953          0        194
+
+*/
+
+
+/*I am using the variables Medicaid Medicare LowCost Free and Public Assistance
+as proxys for poverty, so I want to run a loop to tab all these variables at
+once*/
+
+foreach v of varlist Medicaid Medicare LowCost Free PublicAssistance{
+ ta `v', p
+
+}
+
+
+/* Medicaid |      Freq.
+------------+------------+-----------------------------------------------------
+        Yes |      2,281 |*****************************************************
+------------+------------+-----------------------------------------------------
+      Total |      2,281 
+
+   Medicare |      Freq.
+------------+------------+-----------------------------------------------------
+         No |          1 |
+        Yes |      1,952 |*****************************************************
+------------+------------+-----------------------------------------------------
+      Total |      1,953 
+
+   Low Cost |      Freq.
+------------+------------+-----------------------------------------------------
+          0 |     37,814 |*****************************************************
+          1 |      2,790 |****
+------------+------------+-----------------------------------------------------
+      Total |     40,604 
+
+       Free |      Freq.
+------------+------------+-----------------------------------------------------
+          0 |     32,773 |*****************************************************
+          1 |      7,831 |*************
+------------+------------+-----------------------------------------------------
+      Total |     40,604 
+
+      COUNT |
+   RECEIVES |
+     PUBLIC |
+ ASSISTANCE |      Freq.
+------------+------------+-----------------------------------------------------
+          0 |        531 |*****************************************************
+          1 |         19 |**
+          2 |        245 |************************
+          3 |         33 |***
+          4 |          3 |
+          5 |         10 |*
+          7 |          3 |
+          8 |          9 |*
+          9 |          3 |
+         10 |          1 |
+         11 |          1 |
+         12 |          2 |
+         14 |          1 |
+         17 |          2 |
+         18 |          1 |
+         19 |          3 |
+         20 |          5 |
+         21 |          3 |
+         22 |          2 |
+         23 |          2 |
+         24 |          1 |
+         27 |          1 |
+         28 |          1 |
+         33 |          2 |
+         35 |          2 |
+         42 |          1 |
+         51 |          1 |
+         61 |          1 |
+         70 |          1 |
+         71 |          1 |
+         77 |          1 |
+        112 |          1 |
+        155 |          1 |
+------------+------------+-----------------------------------------------------
+      Total |        894 
+*/
+/*We can see that most people in the demographics database, which included
+the PublicAssistance variable, do not have Public Assistance//
+In regards to access to HIV Centers that offer free or low cost services, we
+can see that not many of the centers offer such services*/
+
+
+foreach v of varlist Male Female PacificIslander HispanicLatino AmericanIndian Asian White AfricanAmerican{
+tab `v'
+}
+
+/*
+ COUNT MALE |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        272       30.43       30.43
+          1 |         16        1.79       32.21
+          2 |        260       29.08       61.30
+          3 |         11        1.23       62.53
+          4 |          3        0.34       62.86
+          5 |         34        3.80       66.67
+          7 |         12        1.34       68.01
+          8 |          4        0.45       68.46
+          9 |          1        0.11       68.57
+         10 |          5        0.56       69.13
+         11 |          1        0.11       69.24
+         14 |          1        0.11       69.35
+         15 |          1        0.11       69.46
+         16 |        236       26.40       95.86
+         19 |          1        0.11       95.97
+         20 |          5        0.56       96.53
+         21 |          1        0.11       96.64
+         22 |          2        0.22       96.87
+         23 |          1        0.11       96.98
+         24 |          1        0.11       97.09
+         25 |          1        0.11       97.20
+         26 |          3        0.34       97.54
+         27 |          1        0.11       97.65
+         30 |          1        0.11       97.76
+         32 |          2        0.22       97.99
+         33 |          1        0.11       98.10
+         35 |          1        0.11       98.21
+         38 |          1        0.11       98.32
+         40 |          1        0.11       98.43
+         41 |          2        0.22       98.66
+         44 |          1        0.11       98.77
+         50 |          3        0.34       99.11
+         54 |          1        0.11       99.22
+         56 |          1        0.11       99.33
+         59 |          1        0.11       99.44
+         62 |          1        0.11       99.55
+         70 |          1        0.11       99.66
+         82 |          1        0.11       99.78
+        135 |          1        0.11       99.89
+        157 |          1        0.11      100.00
+------------+-----------------------------------
+      Total |        894      100.00
+
+      COUNT |
+     FEMALE |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        402       44.97       44.97
+          1 |        129       14.43       59.40
+          2 |         13        1.45       60.85
+          3 |          8        0.89       61.74
+          4 |          6        0.67       62.42
+          5 |          4        0.45       62.86
+          6 |          7        0.78       63.65
+          7 |          5        0.56       64.21
+          8 |          4        0.45       64.65
+         11 |         29        3.24       67.90
+         12 |          7        0.78       68.68
+         13 |          3        0.34       69.02
+         17 |          6        0.67       69.69
+         19 |        236       26.40       96.09
+         20 |          1        0.11       96.20
+         21 |          2        0.22       96.42
+         22 |          1        0.11       96.53
+         24 |          1        0.11       96.64
+         25 |          1        0.11       96.76
+         26 |          1        0.11       96.87
+         29 |          1        0.11       96.98
+         31 |          1        0.11       97.09
+         32 |          1        0.11       97.20
+         33 |          2        0.22       97.43
+         34 |          1        0.11       97.54
+         36 |          1        0.11       97.65
+         39 |          2        0.22       97.87
+         44 |          1        0.11       97.99
+         46 |          1        0.11       98.10
+         49 |          1        0.11       98.21
+         50 |          1        0.11       98.32
+         52 |          1        0.11       98.43
+         53 |          2        0.22       98.66
+         61 |          1        0.11       98.77
+         64 |          1        0.11       98.88
+         65 |          2        0.22       99.11
+         66 |          1        0.11       99.22
+         74 |          1        0.11       99.33
+         97 |          1        0.11       99.44
+        115 |          1        0.11       99.55
+        170 |          1        0.11       99.66
+        182 |          1        0.11       99.78
+        183 |          1        0.11       99.89
+        194 |          1        0.11      100.00
+------------+-----------------------------------
+      Total |        894      100.00
+
+      COUNT |
+    PACIFIC |
+   ISLANDER |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        890       99.55       99.55
+          1 |          2        0.22       99.78
+          2 |          2        0.22      100.00
+------------+-----------------------------------
+      Total |        894      100.00
+
+      COUNT |
+   HISPANIC |
+     LATINO |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        566       63.31       63.31
+          1 |        253       28.30       91.61
+          2 |         37        4.14       95.75
+          3 |          6        0.67       96.42
+          4 |          4        0.45       96.87
+          5 |          1        0.11       96.98
+          6 |          3        0.34       97.32
+          7 |          4        0.45       97.76
+          8 |          1        0.11       97.87
+          9 |          3        0.34       98.21
+         10 |          1        0.11       98.32
+         14 |          3        0.34       98.66
+         15 |          1        0.11       98.77
+         16 |          1        0.11       98.88
+         21 |          1        0.11       98.99
+         22 |          2        0.22       99.22
+         24 |          1        0.11       99.33
+         27 |          1        0.11       99.44
+         35 |          1        0.11       99.55
+         36 |          2        0.22       99.78
+         51 |          2        0.22      100.00
+------------+-----------------------------------
+      Total |        894      100.00
+
+      COUNT |
+   AMERICAN |
+     INDIAN |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        888       99.33       99.33
+          1 |          5        0.56       99.89
+          2 |          1        0.11      100.00
+------------+-----------------------------------
+      Total |        894      100.00
+
+COUNT ASIAN |
+        NON |
+   HISPANIC |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        217       24.27       24.27
+          1 |        147       16.44       40.72
+          2 |        249       27.85       68.57
+          3 |          4        0.45       69.02
+          4 |          3        0.34       69.35
+          5 |          2        0.22       69.57
+          7 |          3        0.34       69.91
+          8 |          5        0.56       70.47
+          9 |         28        3.13       73.60
+         28 |        236       26.40      100.00
+------------+-----------------------------------
+      Total |        894      100.00
+
+COUNT WHITE |
+        NON |
+   HISPANIC |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        590       66.00       66.00
+          1 |         14        1.57       67.56
+          2 |          5        0.56       68.12
+          3 |          2        0.22       68.34
+          4 |          7        0.78       69.13
+          6 |        237       26.51       95.64
+          7 |          1        0.11       95.75
+         11 |          3        0.34       96.09
+         13 |          3        0.34       96.42
+         15 |          1        0.11       96.53
+         18 |          1        0.11       96.64
+         19 |          1        0.11       96.76
+         28 |          1        0.11       96.87
+         32 |          1        0.11       96.98
+         33 |          1        0.11       97.09
+         35 |          1        0.11       97.20
+         36 |          2        0.22       97.43
+         37 |          3        0.34       97.76
+         39 |          1        0.11       97.87
+         44 |          1        0.11       97.99
+         46 |          1        0.11       98.10
+         50 |          1        0.11       98.21
+         52 |          1        0.11       98.32
+         61 |          1        0.11       98.43
+         62 |          1        0.11       98.55
+         76 |          1        0.11       98.66
+         81 |          1        0.11       98.77
+         83 |          1        0.11       98.88
+         95 |          2        0.22       99.11
+        117 |          1        0.11       99.22
+        127 |          1        0.11       99.33
+        195 |          1        0.11       99.44
+        205 |          1        0.11       99.55
+        216 |          1        0.11       99.66
+        239 |          1        0.11       99.78
+        243 |          1        0.11       99.89
+        262 |          1        0.11      100.00
+------------+-----------------------------------
+      Total |        894      100.00
+
+COUNT BLACK |
+        NON |
+   HISPANIC |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        799       89.37       89.37
+          1 |         13        1.45       90.83
+          2 |          7        0.78       91.61
+          3 |          3        0.34       91.95
+          4 |          5        0.56       92.51
+          5 |         34        3.80       96.31
+          6 |          1        0.11       96.42
+          7 |          4        0.45       96.87
+          8 |          4        0.45       97.32
+          9 |          2        0.22       97.54
+         10 |          2        0.22       97.76
+         11 |          1        0.11       97.87
+         12 |          2        0.22       98.10
+         15 |          6        0.67       98.77
+         18 |          3        0.34       99.11
+         20 |          1        0.11       99.22
+         21 |          1        0.11       99.33
+         23 |          1        0.11       99.44
+         36 |          1        0.11       99.55
+         47 |          2        0.22       99.78
+         50 |          1        0.11       99.89
+         60 |          1        0.11      100.00
+------------+-----------------------------------
+      Total |        894      100.00
+*/
+/*This table was very helpful because it is very challenging to see the number
+of people by race by gender. Though I wonder if, since gender only has male
+and female, a loop would not be necessary to see these number in their totality*/
+
+save "Animal_Abuse_COMPLETE", replace
